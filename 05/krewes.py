@@ -1,7 +1,8 @@
 """ 
 Ishita_Gupta Eric_Lo Victoria_Gao
 SoftDev
-K05 -- Teamwork, but Better This Time """
+K05 -- Teamwork, but Better This Time 
+2020-09-25"""
 import random
 
 KREWES = {
