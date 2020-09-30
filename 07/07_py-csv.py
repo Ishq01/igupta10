@@ -27,4 +27,6 @@ for line in occupations:
 
 #Prints a random job based on the weighted probability retrieved from occupations.csv
 #jobsPercentages.keys() gives all the job titles and jobsPercentages.values() gives the percentages
-print((random.choices(jobsPercentages.keys(), weights=jobsPercentages.values(), k=1)))
+#jobsPercentages.keys() and jobsPercentages.values() return non-iterable objects, they need to be casted as lists
+#random.choices returns a list, so we include the index to remove the brackets
+print((random.choices(list(jobsPercentages.keys()), weights=list(jobsPercentages.values()), k=1))[0])
