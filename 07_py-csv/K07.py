@@ -22,7 +22,7 @@ for line in occupations:
     #Converts the percentage into a float
     percentage = float(line[-1])
     #Updates dictionary with new key_value pair
-    jobsPercentages[jobTitle] = percentage
+    jobsPercentages[jobTitle] = percentage  
     
 
 #Prints a random job based on the weighted probability retrieved from occupations.csv
