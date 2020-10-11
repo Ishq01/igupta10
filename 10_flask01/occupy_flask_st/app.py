@@ -1,3 +1,11 @@
+"""
+Team AEI
+Ishita Gupta, Eric Lo, Alvin Wu
+SoftDev
+K10 -- Putting Little Pieces Together / Compared differences between four flask app versions and also programmed our own mini app.
+2020-10-08
+"""
+
 import random
 from flask import Flask
 app = Flask(__name__) 
@@ -21,10 +29,10 @@ for line in occupations:
     jobsPercentages[jobTitle] = percentage  
     
 #Choose random job
-job = ((random.choices(list(jobsPercentages.keys()), weights=list(jobsPercentages.values()), k=1))[0])
 
 @app.route("/")       
 def hello_world():
+    job = ((random.choices(list(jobsPercentages.keys()), weights=list(jobsPercentages.values()), k=1))[0])
     output = "Team AEI: Alvin Wu, Eric Lo, Ishita Gupta" + "<br/><br/>" + "List of potential jobs:" + "<br/><br/>" + str(list(jobsPercentages.keys())) + "<br/><br>" +  "Job: " + job
     return output
 
