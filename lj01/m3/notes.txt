@@ -1,0 +1,127 @@
+Ishita Gupta, Carlos Hernandez, Michael Hui
+SoftDev
+LJ00: Le Voyage de Learnination avec Mongo, Première Phase -- Notes from Chapter 3
+2020-10-30
+
+Inserting New Documents
+- Atlas UI
+    - Insert Document (top of collection view)
+        - Can edit in two views- JSON or normal text
+        - Both views have "_id" field populated
+- _id
+    - Every MongoDB doc in a collection must have a unique _id value
+    - The rest of the keys/values are not enforeced by default
+        - Have a collection with the exact doc, with only the _id differing
+        - Have a collection with vastly different docs, with nothing in common
+            - MongoDB has scheme validation functionality that allows users to enforce rules
+
+    - ObjectId()
+        - Default value for the _id field unless otherwise specified
+            - Can be anything (string, int, etc.)
+
+- Mongo Shell
+    1. Connect to the Atlas Cluster
+        - mongo "mongodb+srv://<username>:<password>@<cluster>.mongodb.net/admin"
+        - Default of <dbname> is admin
+    2. COMMANDS:
+        a) use <collection name> : to select specific collection
+            > use sample_training
+
+        b) db.<collection name>.findOne(); : get a random document from the collectiom
+            > db.inspections.findOne()
+
+        c) db.<collection name>.insert({key:value}) : insert document
+            - In given example, insert copied doc: returns "duplicate key error" 
+            - Removing the key-value pair fixes the error (random "_id" value generated)
+
+        d) db.<collection name>.insert([{key:value}, {key1:value1}]) : insert multiple docs at once
+            > db.inspections.insert([ { "test": 1 }, { "test": 2 }, { "test": 3 } ]) 
+
+            - Inserted in the order listed, unless otherwise specified 
+            > db.inspections.insert([{ "_id": 1, "test": 1 },{ "_id": 1, "test": 2 }, { "_id": 3, "test": 3 }])
+            - Only doc 1 gets inserted, stops after encountering "duplicate key error" at doc 2
+
+            i) db.<collection name>.insert([{key:value}, {key1:value1}], {"ordered": false})
+            > db.inspections.insert([{ "_id": 1, "test": 1 },{ "_id": 1, "test": 2 }, { "_id": 3, "test": 3 }],{ "ordered": false })
+            - Insert all docs with unique _id values
+            - All docs with duplicate keys produce their own error 
+
+        - If you misspell collection name by accident when inserting docs, creates a new collection with specified docs
+        > db.inspection.insert([{ "_id": 1, "test": 1 },{ "_id": 3, "test": 3 }])
+         
+Updating Documents
+- Atlas UI
+    - Hover over desired doc, edit/copy/clone/delete
+    - View similar to when inserting docs
+
+- Mongo Shell: MQL
+    - updateOne()
+        - Similar to "findOne()" -> returns first matching doc
+    - updateMany()
+        - Similar to "find()" -> returns cursor with all matching docs
+    - COMMANDS (example):
+        a) Connect to Atlas Cluster
+        > mongo "mongodb+srv://<username>:<password>@<cluster>.mongodb.net/admin"
+
+        b) Access specific database
+        > use sample_training
+
+        c) Increase value of a specific field
+        > db.zips.updateMany({ "city": "HUDSON" }, { "$inc": { "pop": 10 } })
+        - Update all docs with city as "HUDSON" by adding 10 to the "pop" field
+
+        d) Set value of a specific field
+        > db.zips.updateOne({ "zip": "12534" }, { "$set": { "pop": 17630 } })
+        - Update a single document where the zip field is equal to "12534" by setting the value of the "pop" field
+        - If field does not already exist, gets implicitly created
+
+        e) Add document element to array
+        > db.grades.updateOne({ "student_id": 250, "class_id": 339 },
+                                { "$push": { "scores": { "type": "extra credit",
+                                                        "score": 100 }
+                                            }
+                                })
+        -Update one document in the grades collection where student and class is specified by adding extra credit
+    - MQL Operators:
+        - increments field value by a specified amount
+        > {"$inc": {"key":increment value, "key2":increment value2}}
+
+        - sets field value to a new specified value
+        > {"$set": {"key":new value, "key2":new value2}}
+
+        - add new field 
+        > {"$push": {"newkey":new value, "newkey2":new value2}}
+
+Deleting Documents and Collections
+- Atlas UI
+    - Hover over desired doc, edit/copy/clone/delete
+    - View similar to when inserting docs
+    - Can delete collectios this way as well
+
+- Mongo Shell: MQL
+    - deleteOne()
+        - Similar to "findOne()" -> returns first matching doc
+        - Should only use when querying by "_id" for best results
+    - deleteMany()
+        - Similar to "find()" -> returns cursor with all matching docs
+  
+    - COMMANDS (example):
+        a) Connect to Atlas Cluster
+        > mongo "mongodb+srv://<username>:<password>@<cluster>.mongodb.net/admin"
+
+        b) Access specific database
+        > use s ample_training
+
+        c) Delete documents
+        > db.inspections.deleteMain({"key":value})
+
+        d) Show all collections in database
+        > show collections
+
+        e) Drop a collection
+        > db.inspection.drop()
+
+
+
+
+

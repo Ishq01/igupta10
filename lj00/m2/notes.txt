@@ -1,0 +1,117 @@
+The Blob Seizure Crew - Helena Williams, Ishita Gupta, Jessica Yeung
+SoftDev
+LJ00: Le Voyage de Learnination avec Mongo, Première Phase -- Notes from Chapter 2
+2020-10-25
+
+JSON
+- Can view documents in JSON
+    - JSON: JavaScript Standard Object Notation
+    - JSON format: 
+        - Start and end doc with curly braces {}
+        - Separate each key and value with a colon :
+        - Separate each key:value pair with a comma ,
+        - "keys" must be in quotations ""
+            - Keys are also known as fields
+        - Sub-document: a doc as a value
+
+- Pros and Cons
+    - Pros:
+        - User-friendly
+        - Readable
+        - Familiar for many developers
+    - Cons:
+        - Text-based format makes it slow to parse
+        - Readable format is space-consuming
+        - Only supports limited number of basic data types
+
+    - To address drawbacks, MongoDB uses BSON
+        - BSON: Binary JSON
+            - Bridges gap btwn binary representation and JSON format
+            - MongoDB stores data in BSON, internally and over the network
+            - Optimized for:
+                - Speed
+                - Space 
+                - Flexibility
+- JSON vs. BSON
+    - JSON:
+        - Encoding: UFT-8 String
+        - Data Support: String, Boolean, Number, Array
+        - Readability: Human and Machine
+    - BSON:
+        - Encoding: Binary
+        - Data Support: String, Boolean, Number, Array, Date, Raw Binary
+        - Readability: Machine only
+            
+Importing/Exporting
+- Want to back cloud data up locally/export to a different system: BSON
+- Want to export to a local machine: JSON
+- URI string:
+    - URI: Uniform Resource Identifier
+    - srv - establishes a secure connection
+- COMMANDS:
+    > JSON:
+        > import data from JSON, and other supported non BSON formats
+        > mongoimport: 
+            > --uri "<Atlas Cluster URI>"
+            > --drop=<filename>.json 
+
+        > does work with JSON, but it would export it, thus making a copy of the data 
+        outside of the Atlas cluster, rather than adding a collection to the Atlas cluster.
+        > mongoexport
+            > --uri "<Atlas Cluster URI>"
+            > --collection=<collection name>
+            > --out=<filename>.json
+
+    > BSON:
+        > import data from a mongodump created BSON format
+        > mongorestore
+            > --uri "<Atlas Cluster URI>"
+            > --drop dump
+
+        > export data in its raw BSON form
+        > mongodump
+            > --uri "<Atlas Cluster URI>"
+- CODE FROM LECTURE:
+
+    > mongodb+srv://user:password@clusterURI.mongodb.net/database
+        > mongodb...@ -> connect to Atlast Cluster
+        > @...net -> directs to unique clusterURI
+        > database -> specify which database we're looking to export/import
+
+    > mongodump --uri "mongodb+srv://<your username>:<your password>@<your cluster>.mongodb.net/sample_supplies"
+    > mongoexport --uri="mongodb+srv://<your username>:<your password>@<your cluster>.mongodb.net/sample_supplies" --collection=sales --out=sales.json
+    > mongorestore --uri "mongodb+srv://<your username>:<your password>@<your cluster>.mongodb.net/sample_supplies"  --drop dump
+    > mongoimport --uri="mongodb+srv://<your username>:<your password>@<your cluster>.mongodb.net/sample_supplies" --drop sales.json
+
+Data Explorer:
+- Querying in Atlas UI
+    - Enter JSON formatted query in filter:
+        > {"state":"NY", "city":"ALBANY"} 
+- Querying in the shell
+    1. Connect to the shell
+        - mongo "mongodb+srv://sandbox.____.mongodb.net/<dbname>" --username m001-student
+        - Default of <dbname> is admin
+    2. COMMANDS:
+        a) show dbs : show list of databases
+            > show dbs
+
+        b) use <dbname> : to select specific database
+            > use sample_training
+
+        c) show collections : view collections in database
+            > show collections
+
+        d) db.<collection name>.find( {"key":value} ) : find documents with matching key:value pairs
+            > db.zips.find({"state": "NY"})
+
+            - .count() : return number of docs matching query
+            > db.zips.find({"state": "NY"}).count() 
+
+            - .pretty() : format returned doc
+            > db.zips.find({"state": "NY"}).pretty() 
+
+        e) it : iterates through the cursor
+            - cursor: a pointer to a result set of a query 
+                - pointer: a direct address of the memory location
+            > it
+        

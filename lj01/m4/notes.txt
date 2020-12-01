@@ -1,0 +1,127 @@
+Ishita Gupta, Carlos Hernandez, Michael Hui
+SoftDev
+LJ00: Le Voyage de Learnination avec Mongo, Deuxième Phase -- Notes from Chapter 4
+2020-11-2
+
+Advanced CRUD Operations
+
+Update Operators 
+- Enable users to modify data in the database
+- Operations starts with $: $inc, $set, $unset
+- $ has multiple uses:
+    - Precedes MQL operators
+    - Precedes aggregation pipelines
+    - Allows access to field values
+
+Query Operators: ways to locate data within the database
+
+Comparison Operators: {"key": {operator: value}}
+    - $eq -> EQual to
+    - $neq -> Not EQual to
+    - $gt -> Greater Than
+    - $lt -> Less Than
+    - $gte -> Greater Than or Equal to
+    - $lte -> Less Than or Equal to
+
+    - Atlas UI:
+        - Enter {"key": {operator: value}} as in the Find field to query data
+
+    - Mongo Shell:
+        1. Connect to the Atlas Cluster
+            - mongo "mongodb+srv://<username>:<password>@<cluster>.mongodb.net/admin"
+        
+        2. COMMANDS (example):
+            a) Specify database
+            > use sample_training
+
+            b) Query Data
+            > db.trips.find({ "tripduration": { "$lte" : 70 },
+                            "usertype": { "$ne": "Subscriber" } }).pretty()
+            - Find entries with trip durating >= 70 and user != subscriber
+
+            c) $eq is implicit
+            > db.trips.find({ "tripduration": { "$lte" : 70 },
+                            "usertype": { "$eq": "Customer" }}).pretty()
+            > db.trips.find({ "tripduration": { "$lte" : 70 },
+                            "usertype": "Customer" }).pretty()
+            - The above two examples will return the same results
+
+Logic Operators: {operator: [{statement1}, {statement2}]} -> statements are comparison queries
+    - $and -> Match all of the specified query clauses 
+    - Implicit $and: Default operator when one is not specified 
+        - Find student ids that are 25 < x < 100
+        > {"$and: [{"student_id": {"$gt": 25}}, {"student_id": {"$lt": 100}}]}
+        > {"student_id": {"$gt": 25}}, {"student_id": {"$lt": 100}}
+        > {"student_id": {"$gt": 25, "$lt": 100}}
+    
+    - Explicit $and: include the same operator more than once in a query
+        - "this" or "this" and "this" or "this"
+    
+    - $or -> Match at least one of the specified query clauses 
+    - $nor -> Match none of the specified query clauses 
+    > {$not: {statement}}
+    - $not -> Negates  specified query clause
+
+    - Atlas UI  
+    - Enter query in the Find field
+
+    - Mongo Shell 
+        - Example of explicit $and
+        > db.routes.find({ "$and": [ { "$or" :[ { "dst_airport": "KZN" },
+                                { "src_airport": "KZN" }
+                                ] },
+                        { "$or" :[ { "airplane": "CR2" },
+                                    { "airplane": "A81" } ] }
+                        ]}).pretty()
+
+Expressive Query Operator: {"$expr": {expression}}
+    - $expr
+        - Allows the use of aggregation expressions within the query language
+        - Allows the use of variables and conditional statements
+        - Compare fields of the same document to each other
+        - $: denote the use of an operator, access the field value
+
+        - MQL Syntax: {<field>: {<operator>: <value>}}
+        - Aggregation Syntax: {<operator>: {<field>, <value>}}
+
+    - Mongo Shell  
+        - COMMANDS (example):
+            > db.trips.find  ({"$expr": {"$eq": ["$end station id", "$start station id"]}}).count()
+            - Returns all trips that started and ended at the same station 
+            - By using $, don't have to specify the value of the field
+
+            - Combining $and and $expr
+            > db.trips.find({"$expr": {"$and": [{"$gt": ["$tripduration", 1200]},
+                            {"$eq": ["$end station id", "$start station id"]}]}}).count()
+                - Return trips that started/ended at the same station and lasted longer than 20 mins 
+               
+Array Operators: db.<collection name>.find(<query>, <projection>)
+    - To indicate that a value is part of an array, surround with []
+    > db.listingsAndReviews.find({ "amenities": ["shampoo, heating"]
+        - Only results exact matches (order + values)
+    
+    - $all: returns all documents that contain specified values
+
+    > db.listingsAndReviews.find({ "amenities": {
+                                  "$size": 20,
+                                  "$all": [ "Internet", "Wifi",  "Kitchen",
+                                           "Heating", "Family/kid friendly",
+                                           "Washer", "Dryer", "Essentials",
+                                           "Shampoo", "Hangers",
+                                           "Hair dryer", "Iron",
+                                           "Laptop friendly workspace" ]
+                                         }
+                            }).pretty()
+    - Find all documents with eactly 20 amenities which include all the specified amenities
+
+    - Projection: determines what fields the returned cursor shows
+        - Used if too many elements to sort through
+        > db.listingsAndReviews.find({"amenities": "Wifi"}, {"price": 1, "address": 1}).pretty()
+            - Value of 1 to include the field, value of  0 to exclude the field
+            - Cannot mix both unless using all 1’s and excluding the _id
+
+    - $elemMatch: shows results based on the elements inside of array fields (can be used in query or in projection)
+    > db.grades.find({ "class_id": 431 }, {"scores": {"$elemMatch": {"score": {"$gt": 85 }}}}).pretty()
+
+    - $regex: match string patterns
+        > {"field": {$regex: 'pattern', $options: '<options>' }}
