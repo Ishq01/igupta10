@@ -28,7 +28,7 @@ Atlas Products and Options
   - Within a cluster
   - Allows developers to create dynamic data visualizations and use them wherever they like
   - Each dashboard can have many charts within it
-  - Can view the aggregation pipelines used to create each chart
+  - Can view the aggregation pipelines used to create each chart 
 
 MongoDB Compass
 - The Graphical User Interface for MongoDB (separate download) - UI Tool
