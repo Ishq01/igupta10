@@ -1,0 +1,52 @@
+The Blob Seizure Crew - Helena Williams, Ishita Gupta, Jessica Yeung
+SoftDev
+LJ02: Le Voyage de Learnination avec Mongo, Troisième Phase -- Notes from Chapter 5
+2020-11-16
+
+Indexing and Aggregation Pipeline
+
+Aggregation Framework: aggregate([{action1}, {action2},... ])
+- Another way to query
+- Use aggregate() instead of find() to group and modify data in query
+- Order of elements in pipeline matters, actions are executed in that order
+    > db.listingsAndReviews.aggregate([{ "$match": {"amenities": "Wifi" } { "$project": { "price": 1,  "address": 1, "_id": 0 }}]).pretty()
+        - $match: {query}: filters out everything that doesn’t match the query (keeps only amenities with WiFi)
+        - $project: {query} filters out every field that doesn’t match the query
+        - $group: { _id: “<something>”,                                //group by expression
+        <field1>: {<accumulator1>: <expression1> },
+        … } }
+- $sum adds up a total
+
+Sort() and Limit():
+- Sort and limit are cursor methods. Cursor methods are not applied to the data stored in the database, but instead applied to the result set that lives in the cursor.
+  - Other examples of cursor methods include pretty() and count()
+> .sort( {<field1> : +/-1, …} ).limit(<#>)
+    - +1 means increasing order, -1 means decreasing, in order of the fields listed
+    - limit(#) returns only the first # of entries in that list
+    - sort().limit() == limit().sort()
+    - sort() is always performed before limit()
+> .skip(<offset>) skips the first <offset> number of entries
+    
+Indexes:
+- Index: special data structure that stores a small portion of the collection’s data set in an easy to traverse form (it optimized queries)
+- Special data structure in a database that stores small portion of collection dataset in easily traversable form
+- Example of a compound index: db.trips.createIndex({ "start station id": 476, "birth year": 1 })
+  - An index on multiple fields- Increasing or decreasing order is determined by the sign of the 1
+- In compound indexes, field order matters since the it will first order by field 1, then by field 2
+
+Data Modeling:
+- When you organize fields in a document to support querying and application (when to use sub documents, arrays, other documents, etc)
+- Rule: Data is stored in the way that it is used
+    - e.g. Do you have info that varies in amount from doc to doc
+    - Store things together that are regularly queried together
+
+Upsert - Update or Insert?:
+- Everything in MQL that is used to locate a doc can also be used to modify it.
+- updateOne({<query>}, {<update>}, {“upsert”: true})
+- Update if there is a match, insert if there is not match, so you don’t have to search for dupes manually
+- Be mindful if the {<update>} is enough to create a new document, with similar form to the other documents
+- If there is a matched document, an update will occur. If there is no match, then a new document is inserted.
+- upsert: true — conditional updates
+- upsert: false — update an existing document, insert a brand new document
+- Must make sure that {<update>} is enough to create a new document
+  - You also want documents to have the same or similar form to other documents in the collection
