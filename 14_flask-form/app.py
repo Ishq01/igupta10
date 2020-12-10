@@ -5,7 +5,7 @@
 
 from flask import Flask, render_template, request
 
-app = Flask(__name__) 
+app = Flask(__name__)  
 
 @app.route("/", methods=['GET', 'POST'])
 def disp_loginpage():
@@ -15,7 +15,7 @@ def disp_loginpage():
 @app.route("/auth", methods=['GET', 'POST'])
 def authenticate():
     username = request.form['username']
-    return render_template('response.html', name = username)
+    return render_template('response.html', name = username, method = request.method)
     
 if __name__ == "__main__": 
     app.debug = True 
